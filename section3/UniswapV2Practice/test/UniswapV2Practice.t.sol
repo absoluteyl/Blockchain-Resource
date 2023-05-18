@@ -69,18 +69,54 @@ contract UniswapV2PracticeTest is Test {
 
     // # Practice 2: taker swap exact 100 ETH for testUSDC
     function test_taker_swapExactETHForTokens() public addLiquidityForMaker {
+        // Set path
+        address[] memory path = new address[](2);
+        path[0] = address(WETH9);
+        path[1] = address(testUSDC);
+
+        vm.prank(taker);
+        UNISWAP_V2_ROUTER.swapExactETHForTokens{ value: 100 ether }(
+            0,
+            path,
+            address(taker),
+            block.timestamp + 100
+        );
 
         // Checking
         // # Disscussion 1: discuss why 4992488733 ?
+        // input token 要扣 0.3％ 的 fee
+        // (100 + 100 * (1-0.3%)) * (10,000 - x') = 100 * 10,000
+        // => x' = 4992488733
         assertEq(testUSDC.balanceOf(taker), 4992488733);
         assertEq(taker.balance, 0);
     }
 
     // # Practice 3: taker swap exact 10000 USDC for ETH
     function test_taker_swapExactTokensForETH() public addLiquidityForMaker {
+        // Give 10000USDC for taker
+        testUSDC.mint(taker, 10000 * 10 ** testUSDC.decimals());
+
+        // Set path
+        address[] memory path = new address[](2);
+        path[0] = address(testUSDC);
+        path[1] = address(WETH9);
+
+        vm.startPrank(taker);
+        testUSDC.approve(address(UNISWAP_V2_ROUTER), 10000 * 10 ** testUSDC.decimals());
+        UNISWAP_V2_ROUTER.swapExactTokensForETH(
+            10000 * 10 ** testUSDC.decimals(),
+            0,
+            path,
+            address(taker),
+            block.timestamp + 100
+        );
+        vm.stopPrank();
 
         // Checking
-        // # Disscussion 2: original balance is 100 ether, so delta is 49924887330996494742, but why 49924887330996494742 ?
+        // # Disscussion 2: original balance is 100 ether, so delta is 49924887330996494742, but why ?
+        // input token 要扣 0.3％ 的 fee
+        // (100 - y') * (10,000 + (10,000 * 99.7%)) = 100 * 10,000
+        // => y' = 49924887330996494742 (decimals of ether is 18)
         assertEq(testUSDC.balanceOf(taker), 0);
         assertEq(taker.balance, 149924887330996494742);
     }
