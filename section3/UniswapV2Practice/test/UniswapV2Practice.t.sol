@@ -30,7 +30,7 @@ contract UniswapV2PracticeTest is Test {
         deal(maker, 100 ether);
         testUSDC.mint(maker, 10000 * 10 ** testUSDC.decimals());
 
-        // mint 1 ETH to taker
+        // mint 100 ETH to taker
         deal(taker, 100 ether);
 
         // create ETH/USDC pair
