@@ -42,6 +42,21 @@ contract UniswapV2PracticeTest is Test {
         vm.label(address(testUSDC), "TestUSDC");
     }
 
+    modifier addLiquidityForMaker() {
+        vm.startPrank(maker);
+        testUSDC.approve(address(UNISWAP_V2_ROUTER), 10000 * 10 ** testUSDC.decimals());
+        (uint amountA, uint amountB, uint liquid) = UNISWAP_V2_ROUTER.addLiquidityETH{ value: 100 ether }(
+            address(testUSDC),
+            10000 * 10 ** testUSDC.decimals(),
+            0,
+            0,
+            address(maker),
+            block.timestamp + 100
+        );
+        vm.stopPrank();
+        _;
+    }
+
     // # Practice 1: maker add liquidity (100 ETH, 10000 USDC)
     function test_maker_addLiquidityETH() public {
         // Implement here
