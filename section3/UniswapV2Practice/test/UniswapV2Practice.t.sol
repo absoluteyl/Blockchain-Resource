@@ -58,9 +58,8 @@ contract UniswapV2PracticeTest is Test {
     }
 
     // # Practice 1: maker add liquidity (100 ETH, 10000 USDC)
-    function test_maker_addLiquidityETH() public {
-        // Implement here
-
+    function test_maker_addLiquidityETH() public addLiquidityForMaker {
+        // add liquidity part is implemented in modifier
         // Checking
         IUniswapV2Pair wethUsdcPair = IUniswapV2Pair(UNISWAP_V2_FACTORY.getPair(address(WETH9), address(testUSDC)));
         (uint112 reserve0, uint112 reserve1, ) = wethUsdcPair.getReserves();
