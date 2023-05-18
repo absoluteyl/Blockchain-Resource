@@ -68,8 +68,7 @@ contract UniswapV2PracticeTest is Test {
     }
 
     // # Practice 2: taker swap exact 100 ETH for testUSDC
-    function test_taker_swapExactETHForTokens() public {
-        // Impelement here
+    function test_taker_swapExactETHForTokens() public addLiquidityForMaker {
 
         // Checking
         // # Disscussion 1: discuss why 4992488733 ?
@@ -78,8 +77,7 @@ contract UniswapV2PracticeTest is Test {
     }
 
     // # Practice 3: taker swap exact 10000 USDC for ETH
-    function test_taker_swapExactTokensForETH() public {
-        // Impelement here
+    function test_taker_swapExactTokensForETH() public addLiquidityForMaker {
 
         // Checking
         // # Disscussion 2: original balance is 100 ether, so delta is 49924887330996494742, but why 49924887330996494742 ?
