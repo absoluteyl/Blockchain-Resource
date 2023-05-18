@@ -123,7 +123,29 @@ contract UniswapV2PracticeTest is Test {
 
     // # Practice 4: maker remove all liquidity
     function test_maker_removeLiquidityETH() public {
-        // Implement here
+        vm.startPrank(maker);
+        // Add Liquidity and get liquidity value
+        testUSDC.approve(address(UNISWAP_V2_ROUTER), 10000 * 10 ** testUSDC.decimals());
+        (,, uint liquidity) = UNISWAP_V2_ROUTER.addLiquidityETH{ value: 100 ether }(
+            address(testUSDC),
+            10000 * 10 ** testUSDC.decimals(),
+            0,
+            0,
+            address(maker),
+            block.timestamp + 100
+        );
+
+        // Approve router to transfer liquidity for maker
+        WETHTestUSDCPair.approve(address(UNISWAP_V2_ROUTER), liquidity);
+        UNISWAP_V2_ROUTER.removeLiquidityETH(
+            address(testUSDC),
+            liquidity,
+            0,
+            0,
+            maker,
+            block.timestamp + 100
+        );
+        vm.stopPrank();
 
         // Checking
         IUniswapV2Pair wethUsdcPair = IUniswapV2Pair(UNISWAP_V2_FACTORY.getPair(address(WETH9), address(testUSDC)));
