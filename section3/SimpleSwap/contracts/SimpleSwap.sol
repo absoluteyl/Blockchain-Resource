@@ -44,6 +44,10 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         reserveB += uint112(amountBIn);
         liquidity = Math.sqrt(amountAIn.mul(amountBIn));
         _mint(msg.sender, liquidity);
+        _safeTransferFrom(tokenA, msg.sender, address(this), amountA);
+        _safeTransferFrom(tokenB, msg.sender, address(this), amountB);
+
+        emit AddLiquidity(msg.sender, amountA, amountB, liquidity);
     }
 
     /// @notice Get the reserves of the pool
@@ -72,5 +76,19 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
             size := extcodesize(_addr)
         }
         return (size > 0);
+    }
+
+    function _safeTransferFrom(
+        address token,
+        address from,
+        address to,
+        uint value
+    ) private {
+        bytes4 selector = bytes4(keccak256(bytes("transferFrom(address,address,uint256)")));
+         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(selector, from, to, value));
+        require(
+            success && (data.length == 0 || abi.decode(data, (bool))),
+            "SimpleSwap: TRANSFER_FAILED"
+        );
     }
 }
