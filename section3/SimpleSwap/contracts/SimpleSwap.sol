@@ -13,8 +13,8 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
 
     constructor(address _tokenA, address _tokenB) {
         // tokenA and tokenB should be contracts
-        require(isContract(_tokenA), "SimpleSwap: TOKENA_IS_NOT_CONTRACT");
-        require(isContract(_tokenB), "SimpleSwap: TOKENB_IS_NOT_CONTRACT");
+        require(_isContract(_tokenA), "SimpleSwap: TOKENA_IS_NOT_CONTRACT");
+        require(_isContract(_tokenB), "SimpleSwap: TOKENB_IS_NOT_CONTRACT");
         // tokenA and tokenB should be different
         require(_tokenA != _tokenB, "SimpleSwap: TOKENA_TOKENB_IDENTICAL_ADDRESS");
         // sort
@@ -55,7 +55,7 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         _tokenB = tokenB;
     }
 
-    function isContract(address _addr) private returns (bool){
+    function _isContract(address _addr) private returns (bool){
         uint32 size;
         assembly {
             size := extcodesize(_addr)
