@@ -3,8 +3,12 @@ pragma solidity 0.8.17;
 
 import { ISimpleSwap } from "./interface/ISimpleSwap.sol";
 import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { SafeMath } from "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 contract SimpleSwap is ISimpleSwap, ERC20 {
+    using SafeMath for uint;
+
     address public tokenA;
     address public tokenB;
 
@@ -35,6 +39,8 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
     ) external returns (uint256 amountA, uint256 amountB, uint256 liquidity){
         reserveA += uint112(amountAIn);
         reserveB += uint112(amountBIn);
+        liquidity = Math.sqrt(amountAIn.mul(amountBIn));
+        _mint(msg.sender, liquidity);
     }
 
     /// @notice Get the reserves of the pool
