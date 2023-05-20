@@ -17,8 +17,8 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         require(isContract(_tokenB), "SimpleSwap: TOKENB_IS_NOT_CONTRACT");
         // tokenA and tokenB should be different
         require(_tokenA != _tokenB, "SimpleSwap: TOKENA_TOKENB_IDENTICAL_ADDRESS");
-        tokenA = _tokenA;
-        tokenB = _tokenB;
+        // sort
+        (tokenA, tokenB) = _tokenA < _tokenB ? (_tokenA, _tokenB) : (_tokenB, _tokenA);
     }
 
     /// @notice Get the reserves of the pool
