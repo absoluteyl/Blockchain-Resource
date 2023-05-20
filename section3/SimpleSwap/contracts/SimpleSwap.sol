@@ -72,8 +72,18 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
     function removeLiquidity(uint256 liquidity) external returns (uint256 amountA, uint256 amountB){
         // liquidity should be greater than 0
         require(liquidity > 0, "SimpleSwap: INSUFFICIENT_LIQUIDITY_BURNED");
+
+        // calculate amountA and amountB
+        uint256 totalSupply = totalSupply();
+        amountA = liquidity.mul(uint256(reserveA)) / totalSupply;
+        amountB = liquidity.mul(uint256(reserveB)) / totalSupply;
+
         _safeTransferFrom(address(this), msg.sender, address(this), liquidity);
         _burn(address(this), liquidity);
+        _safeTransfer(tokenA, msg.sender, amountA);
+        _safeTransfer(tokenB, msg.sender, amountB);
+
+        emit RemoveLiquidity(msg.sender, amountA, amountB, liquidity);
     }
 
     /// @notice Get the reserves of the pool
@@ -102,6 +112,19 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
             size := extcodesize(_addr)
         }
         return (size > 0);
+    }
+
+    function _safeTransfer(
+        address token,
+        address to,
+        uint value
+    ) private {
+        bytes4 selector = bytes4(keccak256(bytes("transfer(address,uint256)")));
+        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(selector, to, value));
+        require(
+            success && (data.length == 0 || abi.decode(data, (bool))),
+            "SimpleSwap: TRANSFER_FAILED"
+        );
     }
 
     function _safeTransferFrom(
