@@ -51,8 +51,13 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         //                                   = (amountIn * reserveB)
         // amountOut = (amountIn * reserveB) / (reserveA + amountIn)
         amountOut = amountIn.mul(reserveB).div(reserveA.add(amountIn));
+        _safeTransferFrom(tokenIn, msg.sender, address(this), amountIn);
+        _safeTransfer(tokenOut, msg.sender, amountOut);
+
         reserveA += amountIn;
         reserveB -= amountOut;
+
+        emit Swap(msg.sender, tokenIn, tokenOut, amountIn, amountOut);
     }
 
     /// @notice Add liquidity to the pool
