@@ -41,16 +41,20 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         // amountIn should be greater than 0
         require(amountIn > 0, "SimpleSwap: INSUFFICIENT_INPUT_AMOUNT");
 
-        // TODO: make sure the order of tokenIn and tokenOut is corresponding to tokenA and tokenB
+        uint256 reserve0;
+        uint256 reserve1;
+        // make sure the order of tokenIn and tokenOut is corresponding to tokenA and tokenB
+        (reserve0, reserve1) = tokenIn < tokenOut ? (reserveA, reserveB) : (reserveB, reserveA);
 
         // Derive for amountOut
-        // reserveA * reserveB = (reserveA + amountIn) * (reserveB - amountOut)
-        //                     = (reserveA + amountIn) * reserveB - (reserveA + amountIn) * amountOut
-        // (reserveA + amountIn) * amountOut = (reserveA + amountIn) * reserveB - (reserveA * reserveB)
-        //                                   = (reserveA * reserveB) + (amountIn * reserveB) - (reserveA * reserveB)
-        //                                   = (amountIn * reserveB)
-        // amountOut = (amountIn * reserveB) / (reserveA + amountIn)
-        amountOut = amountIn.mul(reserveB).div(reserveA.add(amountIn));
+        // reserve0 * reserve1 = (reserve0 + amountIn) * (reserve1 - amountOut)
+        //                     = (reserve0 + amountIn) * reserve1 - (reserve0 + amountIn) * amountOut
+        // (reserve0 + amountIn) * amountOut = (reserve0 + amountIn) * reserve1 - (reserve0 * reserve1)
+        //                                   = (reserve0 * reserve1) + (amountIn * reserve1) - (reserve0 * reserve1)
+        //                                   = (amountIn * reserve1)
+        // amountOut = (amountIn * reserve1) / (reserve0 + amountIn)
+        // amountOut = amountIn.mul(reserve1).div(reserve0.add(amountIn));
+        amountOut = amountIn.mul(reserve1).div(reserve0.add(amountIn));
         _safeTransferFrom(tokenIn, msg.sender, address(this), amountIn);
         _safeTransfer(tokenOut, msg.sender, amountOut);
 
