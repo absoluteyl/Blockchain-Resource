@@ -15,6 +15,8 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         // tokenA and tokenB should be contracts
         require(isContract(_tokenA), "SimpleSwap: TOKENA_IS_NOT_CONTRACT");
         require(isContract(_tokenB), "SimpleSwap: TOKENB_IS_NOT_CONTRACT");
+        // tokenA and tokenB should be different
+        require(_tokenA != _tokenB, "SimpleSwap: TOKENA_TOKENB_IDENTICAL_ADDRESS");
         tokenA = _tokenA;
         tokenB = _tokenB;
     }
