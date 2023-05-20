@@ -12,8 +12,8 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
     address public tokenA;
     address public tokenB;
 
-    uint112 private reserveA;
-    uint112 private reserveB;
+    uint256 private reserveA;
+    uint256 private reserveB;
 
     constructor(address _tokenA, address _tokenB)
         ERC20("SimpleSwap", "SSWAP")
@@ -55,8 +55,8 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
             }
         }
 
-        reserveA += uint112(amountA);
-        reserveB += uint112(amountB);
+        reserveA += amountA;
+        reserveB += amountB;
         liquidity = Math.sqrt(amountA.mul(amountB));
         _mint(msg.sender, liquidity);
         _safeTransferFrom(tokenA, msg.sender, address(this), amountA);
@@ -75,8 +75,8 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
 
         // calculate amountA and amountB
         uint256 totalSupply = totalSupply();
-        amountA = liquidity.mul(uint256(reserveA)) / totalSupply;
-        amountB = liquidity.mul(uint256(reserveB)) / totalSupply;
+        amountA = liquidity.mul(reserveA) / totalSupply;
+        amountB = liquidity.mul(reserveB) / totalSupply;
 
         _safeTransferFrom(address(this), msg.sender, address(this), liquidity);
         _burn(address(this), liquidity);
