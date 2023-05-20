@@ -12,6 +12,9 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
     uint112 private reserveB;
 
     constructor(address _tokenA, address _tokenB) {
+        // tokenA and tokenB should be contracts
+        require(isContract(_tokenA), "SimpleSwap: TOKENA_IS_NOT_CONTRACT");
+        require(isContract(_tokenB), "SimpleSwap: TOKENB_IS_NOT_CONTRACT");
         tokenA = _tokenA;
         tokenB = _tokenB;
     }
@@ -34,5 +37,13 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
     /// @return _tokenB The address of tokenB
     function getTokenB() external view returns (address _tokenB){
         _tokenB = tokenB;
+    }
+
+    function isContract(address _addr) private returns (bool isContract){
+        uint32 size;
+        assembly {
+            size := extcodesize(_addr)
+        }
+        return (size > 0);
     }
 }
