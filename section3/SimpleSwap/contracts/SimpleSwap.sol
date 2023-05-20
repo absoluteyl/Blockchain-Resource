@@ -21,6 +21,20 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         (tokenA, tokenB) = _tokenA < _tokenB ? (_tokenA, _tokenB) : (_tokenB, _tokenA);
     }
 
+    /// @notice Add liquidity to the pool
+    /// @param amountAIn The amount of tokenA to add
+    /// @param amountBIn The amount of tokenB to add
+    /// @return amountA The actually amount of tokenA added
+    /// @return amountB The actually amount of tokenB added
+    /// @return liquidity The amount of liquidity minted
+    function addLiquidity(
+        uint256 amountAIn,
+        uint256 amountBIn
+    ) external returns (uint256 amountA, uint256 amountB, uint256 liquidity){
+        reserveA += uint112(amountAIn);
+        reserveB += uint112(amountBIn);
+    }
+
     /// @notice Get the reserves of the pool
     /// @return _reserveA The reserve of tokenA
     /// @return _reserveB The reserve of tokenB
