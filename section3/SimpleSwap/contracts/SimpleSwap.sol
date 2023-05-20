@@ -40,9 +40,13 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         // amountAIn and amountBIn should be greater than 0
         require(amountAIn > 0, "SimpleSwap: INSUFFICIENT_INPUT_AMOUNT");
         require(amountBIn > 0, "SimpleSwap: INSUFFICIENT_INPUT_AMOUNT");
-        reserveA += uint112(amountAIn);
-        reserveB += uint112(amountBIn);
-        liquidity = Math.sqrt(amountAIn.mul(amountBIn));
+        // TODO: calculation of amountA and amountB shold be more complecated.
+        amountA = amountAIn;
+        amountB = amountBIn;
+
+        reserveA += uint112(amountA);
+        reserveB += uint112(amountB);
+        liquidity = Math.sqrt(amountA.mul(amountB));
         _mint(msg.sender, liquidity);
         _safeTransferFrom(tokenA, msg.sender, address(this), amountA);
         _safeTransferFrom(tokenB, msg.sender, address(this), amountB);
