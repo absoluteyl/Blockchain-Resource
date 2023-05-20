@@ -38,6 +38,9 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         require(tokenOut == tokenA || tokenOut == tokenB, "SimpleSwap: INVALID_TOKEN_OUT");
         // tokenIn and tokenOut should be different
         require(tokenIn != tokenOut, "SimpleSwap: IDENTICAL_ADDRESS");
+        // amountIn should be greater than 0
+        require(amountIn > 0, "SimpleSwap: INSUFFICIENT_INPUT_AMOUNT");
+
         // TODO: make sure the order of tokenIn and tokenOut is corresponding to tokenA and tokenB
 
         // Derive for amountOut
