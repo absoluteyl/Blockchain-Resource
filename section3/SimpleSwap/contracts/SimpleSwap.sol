@@ -11,7 +11,9 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
     uint112 private reserveA;
     uint112 private reserveB;
 
-    constructor(address _tokenA, address _tokenB) {
+    constructor(address _tokenA, address _tokenB)
+        ERC20("SimpleSwap", "SSWAP")
+    {
         // tokenA and tokenB should be contracts
         require(_isContract(_tokenA), "SimpleSwap: TOKENA_IS_NOT_CONTRACT");
         require(_isContract(_tokenB), "SimpleSwap: TOKENB_IS_NOT_CONTRACT");
