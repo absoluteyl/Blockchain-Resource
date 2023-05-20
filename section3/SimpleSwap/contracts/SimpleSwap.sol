@@ -65,6 +65,15 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         emit AddLiquidity(msg.sender, amountA, amountB, liquidity);
     }
 
+    /// @notice Remove liquidity from the pool
+    /// @param liquidity The amount of liquidity to remove
+    /// @return amountA The amount of tokenA received
+    /// @return amountB The amount of tokenB received
+    function removeLiquidity(uint256 liquidity) external returns (uint256 amountA, uint256 amountB){
+        _safeTransferFrom(address(this), msg.sender, address(this), liquidity);
+        _burn(address(this), liquidity);
+    }
+
     /// @notice Get the reserves of the pool
     /// @return _reserveA The reserve of tokenA
     /// @return _reserveB The reserve of tokenB
