@@ -33,6 +33,9 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
     /// @param amountIn The amount of tokenIn to swap
     /// @return amountOut The amount of tokenOut received
     function swap(address tokenIn, address tokenOut, uint256 amountIn) external returns (uint256 amountOut){
+        // tokenIn and tokenOut should be tokenA or tokenB
+        require(tokenIn == tokenA || tokenIn == tokenB, "SimpleSwap: INVALID_TOKEN_IN");
+        require(tokenOut == tokenA || tokenOut == tokenB, "SimpleSwap: INVALID_TOKEN_OUT");
         // TODO: make sure the order of tokenIn and tokenOut is corresponding to tokenA and tokenB
 
         // Derive for amountOut
