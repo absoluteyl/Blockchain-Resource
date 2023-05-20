@@ -27,6 +27,26 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         (tokenA, tokenB) = _tokenA < _tokenB ? (_tokenA, _tokenB) : (_tokenB, _tokenA);
     }
 
+    /// @notice Swap tokenIn for tokenOut with amountIn
+    /// @param tokenIn The address of the token to swap from
+    /// @param tokenOut The address of the token to swap to
+    /// @param amountIn The amount of tokenIn to swap
+    /// @return amountOut The amount of tokenOut received
+    function swap(address tokenIn, address tokenOut, uint256 amountIn) external returns (uint256 amountOut){
+        // TODO: make sure the order of tokenIn and tokenOut is corresponding to tokenA and tokenB
+
+        // Derive for amountOut
+        // reserveA * reserveB = (reserveA + amountIn) * (reserveB - amountOut)
+        //                     = (reserveA + amountIn) * reserveB - (reserveA + amountIn) * amountOut
+        // (reserveA + amountIn) * amountOut = (reserveA + amountIn) * reserveB - (reserveA * reserveB)
+        //                                   = (reserveA * reserveB) + (amountIn * reserveB) - (reserveA * reserveB)
+        //                                   = (amountIn * reserveB)
+        // amountOut = (amountIn * reserveB) / (reserveA + amountIn)
+        amountOut = amountIn.mul(reserveB).div(reserveA.add(amountIn));
+        reserveA += amountIn;
+        reserveB -= amountOut;
+    }
+
     /// @notice Add liquidity to the pool
     /// @param amountAIn The amount of tokenA to add
     /// @param amountBIn The amount of tokenB to add
