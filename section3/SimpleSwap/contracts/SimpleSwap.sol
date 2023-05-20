@@ -58,8 +58,13 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         _safeTransferFrom(tokenIn, msg.sender, address(this), amountIn);
         _safeTransfer(tokenOut, msg.sender, amountOut);
 
-        reserveA += amountIn;
-        reserveB -= amountOut;
+        if (tokenIn < tokenOut) {
+            reserveA += amountIn;
+            reserveB -= amountOut;
+        } else {
+            reserveA -= amountOut;
+            reserveB += amountIn;
+        }
 
         emit Swap(msg.sender, tokenIn, tokenOut, amountIn, amountOut);
     }
