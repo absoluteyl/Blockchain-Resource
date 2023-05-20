@@ -55,7 +55,7 @@ contract SimpleSwapLpTokenTest is SimpleSwapSetUp {
         vm.stopPrank();
     }
 
-    function test_lpToken_should_be_able_to_get_lpToken_after_adding_liquidity() public {
+    function test_maker_should_be_able_to_get_lpToken_after_adding_liquidity() public {
         uint256 amountA = 100 * 10 * tokenADecimals;
         uint256 amountB = 100 * 10 * tokenBDecimals;
         uint256 liquidity = Math.sqrt(amountA * amountB);
@@ -69,7 +69,7 @@ contract SimpleSwapLpTokenTest is SimpleSwapSetUp {
         vm.stopPrank();
     }
 
-    function test_lpToken_should_be_able_to_repay_lptoken_after_removing_liquidity() public {
+    function test_maker_should_be_able_to_repay_lptoken_after_removing_liquidity() public {
         uint256 lpTokenAmount = 10 * 10 ** slpDecimals;
 
         uint256 makerBalance = simpleSwap.balanceOf(maker);
@@ -81,7 +81,7 @@ contract SimpleSwapLpTokenTest is SimpleSwapSetUp {
         vm.stopPrank();
     }
 
-    function test_lpToken_should_be_able_to_transfer_lp_token() public {
+    function test_maker_should_be_able_to_transfer_lp_token() public {
         uint256 lpTokenAmount = 42 * 10 ** slpDecimals;
         vm.startPrank(maker);
         vm.expectEmit(true, true, true, true);
@@ -90,7 +90,7 @@ contract SimpleSwapLpTokenTest is SimpleSwapSetUp {
         vm.stopPrank();
     }
 
-    function test_lpToken_should_be_able_to_approve_lp_token() public {
+    function test_maker_should_be_able_to_approve_lp_token() public {
         uint256 lpTokenAmount = 42 * 10 ** slpDecimals;
         vm.startPrank(maker);
         vm.expectEmit(true, true, true, true);
