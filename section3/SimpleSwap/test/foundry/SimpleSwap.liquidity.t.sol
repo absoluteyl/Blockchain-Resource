@@ -105,7 +105,7 @@ contract SimpleSwapAddLiquidityAfterInitial is SimpleSwapSetUp {
         vm.stopPrank();
     }
 
-    function test_addLiquidity_should__add_liquidity_when_tokenA_proportion_is_greaterthan_tokenB_proportion() public {
+    function test_addLiquidity_should_add_liquidity_when_tokenA_proportion_is_greaterthan_tokenB_proportion() public {
         uint256 amountA = 90 * 10 ** tokenADecimals;
         uint256 amountB = 50 * 10 ** tokenBDecimals;
         uint256 actualAmountB = (amountA * reserveBAfterFirstAddLiquidity) / reserveAAfterFirstAddLiquidity;
@@ -134,7 +134,7 @@ contract SimpleSwapAddLiquidityAfterInitial is SimpleSwapSetUp {
         vm.stopPrank();
     }
 
-    function test_addLiquidity_should__add_liquidity_when_tokenA_proportion_is_lessthan_tokenB_proportion() public {
+    function test_addLiquidity_should_add_liquidity_when_tokenA_proportion_is_lessthan_tokenB_proportion() public {
         uint256 amountA = 100 * 10 ** tokenADecimals;
         uint256 amountB = 40 * 10 ** tokenBDecimals;
         uint256 actualAmountA = (amountB * reserveAAfterFirstAddLiquidity) / reserveBAfterFirstAddLiquidity;
