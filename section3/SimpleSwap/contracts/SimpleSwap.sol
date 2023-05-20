@@ -23,4 +23,16 @@ contract SimpleSwap is ISimpleSwap, ERC20 {
         _reserveA = reserveA;
         _reserveB = reserveB;
     }
+
+    /// @notice Get the address of tokenA
+    /// @return _tokenA The address of tokenA
+    function getTokenA() external view returns (address _tokenA){
+        _tokenA = tokenA;
+    }
+
+    /// @notice Get the address of tokenB
+    /// @return _tokenB The address of tokenB
+    function getTokenB() external view returns (address _tokenB){
+        _tokenB = tokenB;
+    }
 }
