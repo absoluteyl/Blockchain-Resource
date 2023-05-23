@@ -60,7 +60,7 @@ contract Liquidator is IUniswapV2Callee, Ownable {
 
         // 5. call lending protocol to liquidate with USDC and get ETH
         IERC20(callbackData.tokenIn).approve(_FAKE_LENDING_PROTOCOL, callbackData.amountIn);
-        IFakeLendingProtocol(_FAKE_LENDING_PROTOCOL).liquidatePotision();
+        IFakeLendingProtocol(_FAKE_LENDING_PROTOCOL).liquidatePosition();
 
         // 6. deposit ETH to WETH9, because we will get ETH from lending protocol
         IWETH(_WETH9).deposit{ value: callbackData.amountOut }();
