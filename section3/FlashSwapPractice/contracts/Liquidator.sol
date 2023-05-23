@@ -15,10 +15,10 @@ import { IFakeLendingProtocol } from "./interfaces/IFakeLendingProtocol.sol";
 // lending protocol liquidate rule can be found in FakeLendingProtocol.sol
 contract Liquidator is IUniswapV2Callee, Ownable {
     struct CallbackData {
-        address tokenIn;
-        address tokenOut;
-        uint256 amountIn;
-        uint256 amountOut;
+        address tokenIn;   // USDC Address
+        address tokenOut;  // ETH Address
+        uint256 amountIn;  // USDC Amount
+        uint256 amountOut; // ETH Amount
     }
 
     address internal immutable _FAKE_LENDING_PROTOCOL;
