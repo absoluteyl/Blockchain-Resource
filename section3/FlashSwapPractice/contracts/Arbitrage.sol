@@ -9,13 +9,13 @@ import { IUniswapV2Callee } from "v2-core/interfaces/IUniswapV2Callee.sol";
 // This is a pracitce contract for flash swap arbitrage
 contract Arbitrage is IUniswapV2Callee, Ownable {
     struct CallbackData {
-        address borrowPool;
-        address targetSwapPool;
+        address basePool;
+        address targetPool;
         address borrowToken;
         address debtToken;
-        uint256 borrowAmount;
-        uint256 debtAmount;
-        uint256 debtAmountOut;
+        uint256 borrowAmt;
+        uint256 lowDebtAmt;
+        uint256 highDebtAmt;
     }
 
     //
@@ -40,12 +40,23 @@ contract Arbitrage is IUniswapV2Callee, Ownable {
         require(amount0 > 0 || amount1 > 0, "amount0 or amount1 must be greater than 0");
 
         // 3. decode callback data
+        CallbackData memory callbackData = abi.decode(data, (CallbackData));
+        require(msg.sender == callbackData.basePool, "msg.sender must be base pool");
         // 4. swap WETH to USDC
+        IERC20(callbackData.borrowToken).transfer(callbackData.targetPool, callbackData.borrowAmt);
+        IUniswapV2Pair(callbackData.targetPool).swap(
+            0,
+            callbackData.highDebtAmt,
+            address(this),
+            new bytes(0)
+        );
+
         // 5. repay USDC to lower price pool
+        require(IERC20(callbackData.debtToken).transfer(msg.sender, callbackData.lowDebtAmt), "Repay failed");
     }
 
     // Method 1 is
-    //  - borrow WETH from lower price pool
+    //  - use USDC to borrow WETH from lower price pool
     //  - swap WETH for USDC in higher price pool
     //  - repay USDC to lower pool
     // Method 2 is
@@ -53,12 +64,45 @@ contract Arbitrage is IUniswapV2Callee, Ownable {
     //  - swap USDC for WETH in lower pool
     //  - repay WETH to higher pool
     // for testing convenient, we implement the method 1 here
-    function arbitrage(address priceLowerPool, address priceHigherPool, uint256 borrowETH) external {
-        // 1. finish callbackData
-        // 2. flash swap (borrow WETH from lower price pool)
+    function arbitrage(address priceLowerPool, address priceHigherPool, uint256 borrowAmount) external {
+        // Get address of WETH and USDC
+        address borrowToken = IUniswapV2Pair(priceLowerPool).token0();
+        address debtToken = IUniswapV2Pair(priceLowerPool).token1();
 
-        // Uncomment next line when you do the homework
-        // IUniswapV2Pair(priceLowerPool).swap(borrowETH, 0, address(this), abi.encode(callbackData));
+        // Get how much USDC we need to pay to priceLowserPool if we want to borrow 5 WETH
+        (uint112 lowerPoolReserve0, uint112 lowerPoolReserve1,) = IUniswapV2Pair(priceLowerPool).getReserves();
+        uint256 lowerDebtAmount = _getAmountIn(
+            borrowAmount,
+            lowerPoolReserve1,
+            lowerPoolReserve0
+        );
+
+        // Get how much USDC we can get from priceHigherPool if we swap 5 WETH
+        (uint112 higherPoolReserve0, uint112 higherPoolReserve1,) = IUniswapV2Pair(priceHigherPool).getReserves();
+        uint256 higherDebtAmount = _getAmountOut(
+            borrowAmount,
+            higherPoolReserve0,
+            higherPoolReserve1
+        );
+
+        // 1. finish callbackData
+        CallbackData memory callbackData = CallbackData(
+            priceLowerPool,
+            priceHigherPool,
+            borrowToken,
+            debtToken,
+            borrowAmount,
+            lowerDebtAmount,
+            higherDebtAmount
+        );
+
+        // 2. flash swap (borrow WETH from lower price pool)
+        IUniswapV2Pair(priceLowerPool).swap(
+            borrowAmount,
+            0,
+            address(this),
+            abi.encode(callbackData)
+        );
     }
 
     //
