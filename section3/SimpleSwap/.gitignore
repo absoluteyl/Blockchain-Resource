@@ -16,4 +16,7 @@ cache_forge/
 out/
 typechain-types
 
+# Ignores development broadcast logs
+broadcast/
+
 *.ans.*
