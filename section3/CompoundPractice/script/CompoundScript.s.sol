@@ -38,7 +38,8 @@ contract CompoundScript is Script {
     console.log("Address: %s", address(USDC));
 
     console.log("\n=== Dealing with Comptroller ===");
-    ComptrollerInterface comptroller = new Comptroller();
+    Comptroller comptroller = new Comptroller();
+    ComptrollerInterface comptrollerInterface = ComptrollerInterface(address(comptroller));
     console.log("Address: %s", address(comptroller));
 
     console.log("\n=== Dealing with Interest Rate Model ===");
@@ -54,7 +55,7 @@ contract CompoundScript is Script {
     console.log("\n=== Dealing with CERC20 Delegator ===");
     CErc20Delegator cUSDC = new CErc20Delegator(
         address(USDC), // address underlying_,
-        comptroller,   // ComptrollerInterface comptroller_,
+        comptrollerInterface, // ComptrollerInterface comptroller_,
         interestRateModel, // InterestRateModel interestRateModel_,
         initialExchangeRateMantissa, // uint initialExchangeRateMantissa_,
         cTokenName, // string memory name_,
