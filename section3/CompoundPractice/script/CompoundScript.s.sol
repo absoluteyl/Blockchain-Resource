@@ -3,6 +3,8 @@ pragma solidity 0.8.19;
 
 import "forge-std/Script.sol";
 import { ERC20 } from "openzeppelin/token/ERC20/ERC20.sol";
+import { SimplePriceOracle } from "compound-protocol/contracts/SimplePriceOracle.sol";
+import { PriceOracle } from "compound-protocol/contracts/PriceOracle.sol";
 import { Comptroller } from "compound-protocol/contracts/Comptroller.sol";
 import { ComptrollerInterface } from "compound-protocol/contracts/ComptrollerInterface.sol";
 import { WhitePaperInterestRateModel } from "compound-protocol/contracts/WhitePaperInterestRateModel.sol";
@@ -37,9 +39,14 @@ contract CompoundScript is Script {
     console.log("Decimals: %d,", USDC.decimals());
     console.log("Address: %s", address(USDC));
 
+    console.log("\n=== Dealing with Price Oracle ===");
+    PriceOracle priceOracle = new SimplePriceOracle();
+    console.log("Address: %s", address(priceOracle));
+
     console.log("\n=== Dealing with Comptroller ===");
     Comptroller comptroller = new Comptroller();
     ComptrollerInterface comptrollerInterface = ComptrollerInterface(address(comptroller));
+    comptroller._setPriceOracle(priceOracle);
     console.log("Address: %s", address(comptroller));
 
     console.log("\n=== Dealing with Interest Rate Model ===");
