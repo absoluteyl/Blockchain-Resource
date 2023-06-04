@@ -7,6 +7,7 @@ import { SimplePriceOracle } from "compound-protocol/contracts/SimplePriceOracle
 import { PriceOracle } from "compound-protocol/contracts/PriceOracle.sol";
 import { Comptroller } from "compound-protocol/contracts/Comptroller.sol";
 import { ComptrollerInterface } from "compound-protocol/contracts/ComptrollerInterface.sol";
+import { Unitroller } from "compound-protocol/contracts/Unitroller.sol";
 import { WhitePaperInterestRateModel } from "compound-protocol/contracts/WhitePaperInterestRateModel.sol";
 import { InterestRateModel } from "compound-protocol/contracts/InterestRateModel.sol";
 import { CErc20Delegate } from "compound-protocol/contracts/CErc20Delegate.sol";
@@ -48,6 +49,10 @@ contract CompoundScript is Script {
     ComptrollerInterface comptrollerInterface = ComptrollerInterface(address(comptroller));
     comptroller._setPriceOracle(priceOracle);
     console.log("Address: %s", address(comptroller));
+
+    console.log("\n=== Deploying Unitroller ===");
+    Unitroller unitroller = new Unitroller();
+    console.log("Address: %s", address(unitroller));
 
     console.log("\n=== Deploying Interest Rate Model ===");
     InterestRateModel interestRateModel = new WhitePaperInterestRateModel(
