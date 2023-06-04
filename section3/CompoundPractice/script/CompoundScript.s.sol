@@ -15,23 +15,39 @@ import { CErc20Delegator } from "compound-protocol/contracts/CErc20Delegator.sol
 
 contract CompoundScript is Script {
   // Underlaying Token
+  ERC20 public USDC;
   string public uTokenName = "USD Coin";
   string public uTokenSymbol = "USDC";
+
+  // Price Oracle
+  PriceOracle public priceOracle;
+
+  // Comptroller
+  Comptroller public comptroller;
+  Comptroller public proxiedComptroller;
+
+  // Unitroller
+  Unitroller public unitroller;
 
   // Close Factor
   uint256 public closeFactorMantissa = 0.5e18;
 
   // Interest Rate Model
+  InterestRateModel public interestRateModel;
   uint256 public baseRatePerYear = 0;
   uint256 public multiplierPerYear = 0;
+
+  // cToken
+  CErc20Delegate public cErc20Delegate;
+  string public cTokenName = "Compound USD Coin";
+  string public cTokenSymbol = "cUSDC";
+  uint8 public cTokenDecimals = 18;
 
   // Initial Exchange Rate
   uint256 public initialExchangeRateMantissa = 1e18;
 
-  // cToken
-  string public cTokenName = "Compound USD Coin";
-  string public cTokenSymbol = "cUSDC";
-  uint8 public cTokenDecimals = 18;
+  // cToken Delegator
+  CErc20Delegator public cUSDC;
 
   // result to be reused for status check
   uint256 private _result;
@@ -39,50 +55,98 @@ contract CompoundScript is Script {
   function run() external {
     vm.startBroadcast(vm.envUint("WALLET_PRIVATE_KEY"));
 
+    _deployUnderlyingToken();
+    _deployPriceOracle();
+    _deployComptroller();
+    _deployUnitroller();
+    _dealUnitrollerImplementation();
+    _deployInterestRateModel();
+    _deployCTokenDelegate();
+    _deployCTokenDelegator();
+
+    vm.stopBroadcast();
+  }
+
+
+  /*
+  =====================
+  = Private Functions =
+  =====================
+  */
+  function _deployUnderlyingToken() private {
     console.log("\n=== Deploying Underlaying Token ===");
-    ERC20 USDC = new ERC20(uTokenName, uTokenSymbol);
+
+    USDC = new ERC20(uTokenName, uTokenSymbol);
+
     console.log("Name: %s,", USDC.name());
     console.log("Symbol: %s,", USDC.symbol());
     console.log("Decimals: %d,", USDC.decimals());
     console.log("Address: %s", address(USDC));
+  }
 
+  function _deployPriceOracle() private {
     console.log("\n=== Deploying Price Oracle ===");
-    PriceOracle priceOracle = new SimplePriceOracle();
+
+    priceOracle = new SimplePriceOracle();
+
     console.log("Address: %s", address(priceOracle));
+  }
 
+  function _deployComptroller() private {
     console.log("\n=== Deploying Comptroller ===");
-    Comptroller comptroller = new Comptroller();
+
+    comptroller = new Comptroller();
+
     console.log("Address: %s", address(comptroller));
+  }
 
+  function _deployUnitroller() private {
     console.log("\n=== Deploying Unitroller ===");
-    Unitroller unitroller = new Unitroller();
-    console.log("Address: %s", address(unitroller));
 
+    unitroller = new Unitroller();
+
+    console.log("Address: %s", address(unitroller));
+  }
+
+  function _dealUnitrollerImplementation() private {
     console.log("\n=== Dealing with Unitroller implementation ===");
+
     // set implementation
     _result = unitroller._setPendingImplementation(address(comptroller));
     require(_result == 0, "Error setting unitroller pending implementation");
     comptroller._become(unitroller);
-    Comptroller proxiedComptroller = Comptroller(address(unitroller));
+    proxiedComptroller = Comptroller(address(unitroller));
+
     // set close factor
     _result = proxiedComptroller._setCloseFactor(closeFactorMantissa);
     require(_result == 0, "Error setting close factor");
+
     // set price oracle
     _result = proxiedComptroller._setPriceOracle(priceOracle);
     require(_result == 0, "Error setting price oracle");
+  }
 
+  function _deployInterestRateModel() private {
     console.log("\n=== Deploying Interest Rate Model ===");
-    InterestRateModel interestRateModel = new WhitePaperInterestRateModel(
+
+    interestRateModel = new WhitePaperInterestRateModel(
       baseRatePerYear, multiplierPerYear
     );
+
     console.log("Address: %s", address(interestRateModel));
+  }
 
+  function _deployCTokenDelegate() private {
     console.log("\n=== Deploying CERC20 Delegate ===");
-    CErc20Delegate cErc20Delegate = new CErc20Delegate();
-    console.log("Address: %s", address(cErc20Delegate));
 
+    CErc20Delegate cErc20Delegate = new CErc20Delegate();
+
+    console.log("Address: %s", address(cErc20Delegate));
+  }
+
+  function _deployCTokenDelegator() private {
     console.log("\n=== Deploying CERC20 Delegator ===");
-    CErc20Delegator cUSDC = new CErc20Delegator(
+    cUSDC = new CErc20Delegator(
         address(USDC),                // underlying token
         proxiedComptroller,           // comptroller
         interestRateModel,            // interestRateModel
@@ -95,7 +159,5 @@ contract CompoundScript is Script {
         new bytes(0)                  // becomeImplementationData
     );
     console.log("Address: %s", address(cUSDC));
-
-    vm.stopBroadcast();
   }
 }
