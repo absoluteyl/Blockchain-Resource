@@ -26,12 +26,11 @@ contract CompoundScript is Script {
   Comptroller public comptroller;
   Comptroller public proxiedComptroller;
   uint256 public liquidationIncentive = 1e18;
+  uint256 public closeFactorMantissa = 0.5e18;
 
   // Unitroller
   Unitroller public unitroller;
 
-  // Close Factor
-  uint256 public closeFactorMantissa = 0.5e18;
 
   // Interest Rate Model
   InterestRateModel public interestRateModel;
