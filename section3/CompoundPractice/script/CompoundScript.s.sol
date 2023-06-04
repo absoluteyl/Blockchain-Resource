@@ -26,7 +26,7 @@ contract CompoundScript is Script {
   uint256 public multiplierPerYear = 0;
 
   // Initial Exchange Rate
-  uint256 public initialExchangeRateMantissa = 1;
+  uint256 public initialExchangeRateMantissa = 1e18;
 
   // cToken
   string public cTokenName = "Compound USD Coin";
