@@ -25,6 +25,7 @@ contract CompoundScript is Script {
   // Comptroller
   Comptroller public comptroller;
   Comptroller public proxiedComptroller;
+  uint256 public liquidationIncentive = 1e18;
 
   // Unitroller
   Unitroller public unitroller;
@@ -116,6 +117,10 @@ contract CompoundScript is Script {
     require(_result == 0, "Error setting unitroller pending implementation");
     comptroller._become(unitroller);
     proxiedComptroller = Comptroller(address(unitroller));
+
+    // set liquidation incentive
+    _result = proxiedComptroller._setLiquidationIncentive(liquidationIncentive);
+    require(_result == 0, "Error setting liquidation incentive");
 
     // set close factor
     _result = proxiedComptroller._setCloseFactor(closeFactorMantissa);
