@@ -18,6 +18,9 @@ contract CompoundScript is Script {
   string public uTokenName = "USD Coin";
   string public uTokenSymbol = "USDC";
 
+  // Close Factor
+  uint256 public closeFactorMantissa = 0.5e18;
+
   // Interest Rate Model
   uint256 public baseRatePerYear = 0;
   uint256 public multiplierPerYear = 0;
@@ -29,6 +32,9 @@ contract CompoundScript is Script {
   string public cTokenName = "Compound USD Coin";
   string public cTokenSymbol = "cUSDC";
   uint8 public cTokenDecimals = 18;
+
+  // result to be reused for status check
+  uint256 private _result;
 
   function run() external {
     vm.startBroadcast(vm.envUint("WALLET_PRIVATE_KEY"));
@@ -46,13 +52,24 @@ contract CompoundScript is Script {
 
     console.log("\n=== Deploying Comptroller ===");
     Comptroller comptroller = new Comptroller();
-    ComptrollerInterface comptrollerInterface = ComptrollerInterface(address(comptroller));
-    comptroller._setPriceOracle(priceOracle);
     console.log("Address: %s", address(comptroller));
 
     console.log("\n=== Deploying Unitroller ===");
     Unitroller unitroller = new Unitroller();
     console.log("Address: %s", address(unitroller));
+
+    console.log("\n=== Dealing with Unitroller implementation ===");
+    // set implementation
+    _result = unitroller._setPendingImplementation(address(comptroller));
+    require(_result == 0, "Error setting unitroller pending implementation");
+    comptroller._become(unitroller);
+    Comptroller proxiedComptroller = Comptroller(address(unitroller));
+    // set close factor
+    _result = proxiedComptroller._setCloseFactor(closeFactorMantissa);
+    require(_result == 0, "Error setting close factor");
+    // set price oracle
+    _result = proxiedComptroller._setPriceOracle(priceOracle);
+    require(_result == 0, "Error setting price oracle");
 
     console.log("\n=== Deploying Interest Rate Model ===");
     InterestRateModel interestRateModel = new WhitePaperInterestRateModel(
