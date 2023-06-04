@@ -32,45 +32,45 @@ contract CompoundScript is Script {
   function run() external {
     vm.startBroadcast(vm.envUint("WALLET_PRIVATE_KEY"));
 
-    console.log("\n=== Dealing with Underlaying Token ===");
+    console.log("\n=== Deploying Underlaying Token ===");
     ERC20 USDC = new ERC20(uTokenName, uTokenSymbol);
     console.log("Name: %s,", USDC.name());
     console.log("Symbol: %s,", USDC.symbol());
     console.log("Decimals: %d,", USDC.decimals());
     console.log("Address: %s", address(USDC));
 
-    console.log("\n=== Dealing with Price Oracle ===");
+    console.log("\n=== Deploying Price Oracle ===");
     PriceOracle priceOracle = new SimplePriceOracle();
     console.log("Address: %s", address(priceOracle));
 
-    console.log("\n=== Dealing with Comptroller ===");
+    console.log("\n=== Deploying Comptroller ===");
     Comptroller comptroller = new Comptroller();
     ComptrollerInterface comptrollerInterface = ComptrollerInterface(address(comptroller));
     comptroller._setPriceOracle(priceOracle);
     console.log("Address: %s", address(comptroller));
 
-    console.log("\n=== Dealing with Interest Rate Model ===");
+    console.log("\n=== Deploying Interest Rate Model ===");
     InterestRateModel interestRateModel = new WhitePaperInterestRateModel(
       baseRatePerYear, multiplierPerYear
     );
     console.log("Address: %s", address(interestRateModel));
 
-    console.log("\n=== Dealing with CERC20 Delegate ===");
+    console.log("\n=== Deploying CERC20 Delegate ===");
     CErc20Delegate cErc20Delegate = new CErc20Delegate();
     console.log("Address: %s", address(cErc20Delegate));
 
-    console.log("\n=== Dealing with CERC20 Delegator ===");
+    console.log("\n=== Deploying CERC20 Delegator ===");
     CErc20Delegator cUSDC = new CErc20Delegator(
-        address(USDC), // address underlying_,
-        comptrollerInterface, // ComptrollerInterface comptroller_,
-        interestRateModel, // InterestRateModel interestRateModel_,
-        initialExchangeRateMantissa, // uint initialExchangeRateMantissa_,
-        cTokenName, // string memory name_,
-        cTokenSymbol, // string memory symbol_,
-        cTokenDecimals, // uint8 decimals_,
-        payable(address(msg.sender)), // address payable admin_,
-        address(cErc20Delegate), // address implementation_,
-        new bytes(0) // bytes memory becomeImplementationData
+        address(USDC),                // underlying token
+        proxiedComptroller,           // comptroller
+        interestRateModel,            // interestRateModel
+        initialExchangeRateMantissa,  // initialExchangeRateMantissa
+        cTokenName,                   // cToken name
+        cTokenSymbol,                 // cToken symbol
+        cTokenDecimals,               // cToken decimals
+        payable(address(msg.sender)), // admin
+        address(cErc20Delegate),      // CERC20 Delegate implementation,
+        new bytes(0)                  // becomeImplementationData
     );
     console.log("Address: %s", address(cUSDC));
 
