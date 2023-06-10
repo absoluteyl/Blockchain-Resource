@@ -4,12 +4,12 @@ pragma solidity 0.8.19;
 import "forge-std/Script.sol";
 import { ERC20 } from "openzeppelin/token/ERC20/ERC20.sol";
 import { SimplePriceOracle } from "compound-protocol/contracts/SimplePriceOracle.sol";
-import { PriceOracle } from "compound-protocol/contracts/PriceOracle.sol";
+
 import { Comptroller } from "compound-protocol/contracts/Comptroller.sol";
 import { ComptrollerInterface } from "compound-protocol/contracts/ComptrollerInterface.sol";
 import { Unitroller } from "compound-protocol/contracts/Unitroller.sol";
 import { WhitePaperInterestRateModel } from "compound-protocol/contracts/WhitePaperInterestRateModel.sol";
-import { InterestRateModel } from "compound-protocol/contracts/InterestRateModel.sol";
+
 import { CErc20Delegate } from "compound-protocol/contracts/CErc20Delegate.sol";
 import { CErc20Delegator } from "compound-protocol/contracts/CErc20Delegator.sol";
 
@@ -20,7 +20,7 @@ contract CompoundScript is Script {
   string public uTokenSymbol = "USDC";
 
   // Price Oracle
-  PriceOracle public priceOracle;
+  SimplePriceOracle public priceOracle;
 
   // Comptroller
   Comptroller public comptroller;
@@ -33,7 +33,7 @@ contract CompoundScript is Script {
 
 
   // Interest Rate Model
-  InterestRateModel public interestRateModel;
+  WhitePaperInterestRateModel public interestRateModel;
   uint256 public baseRatePerYear = 0;
   uint256 public multiplierPerYear = 0;
 
