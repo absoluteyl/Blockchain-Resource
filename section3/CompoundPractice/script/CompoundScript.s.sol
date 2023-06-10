@@ -22,23 +22,20 @@ contract CompoundScript is Script {
   string public uTokenName = "USD Coin";
   string public uTokenSymbol = "USDC";
 
-  // Price Oracle
-  SimplePriceOracle public priceOracle;
-
   // Comptroller
   Comptroller public comptroller;
   Comptroller public proxiedComptroller;
-  uint256 public liquidationIncentive = 1e18;
-  uint256 public closeFactorMantissa = 0.5e18;
 
   // Unitroller
   Unitroller public unitroller;
-
 
   // Interest Rate Model
   WhitePaperInterestRateModel public interestRateModel;
   uint256 public baseRatePerYear = 0;
   uint256 public multiplierPerYear = 0;
+
+  // Initial Exchange Rate
+  uint256 public initialExchangeRateMantissa = 1e18;
 
   // cToken
   CErc20Delegate public cErc20Delegate;
@@ -46,11 +43,13 @@ contract CompoundScript is Script {
   string public cTokenSymbol = "cUSDC";
   uint8 public cTokenDecimals = 18;
 
-  // Initial Exchange Rate
-  uint256 public initialExchangeRateMantissa = 1e18;
-
   // cToken Delegator
   CErc20Delegator public cToken;
+
+  // Comptroller Params
+  uint256 public liquidationIncentive = 1e18;
+  uint256 public closeFactorMantissa = 0.5e18;
+  SimplePriceOracle public priceOracle;
 
   // result to be reused for status check
   uint256 private _result;
