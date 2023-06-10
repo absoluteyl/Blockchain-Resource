@@ -134,4 +134,70 @@ contract CompoundLendingTest is CompoundLendingSetUp {
 
     vm.stopPrank();
   }
+
+  function testCollateralFactorChangeLiquidation() public {
+    // let cTokenA has tokenA to borrow
+    deal(address(tokenA), address(cTokenA), 10000 * 10**tokenA.decimals());
+
+    // Prepare the debts for user1
+    vm.startPrank(user1);
+
+    // mint cTokenB
+    uint256 mintAmount = 1 * 10**tokenB.decimals();
+    tokenB.approve(address(cTokenB), mintAmount);
+    uint256 mintResult = cTokenB.mint(mintAmount);
+    require(mintResult == 0, "Mint failed");
+    require(cTokenB.balanceOf(address(user1)) == mintAmount, "Mint amount is not correct");
+
+    // collateralize cTokenB
+    address[] memory cTokens = new address[](1);
+    cTokens[0] = address(cTokenB);
+    proxiedComptroller.enterMarkets(cTokens);
+
+    // make sure cTokenB is been collateral
+    CToken[] memory assetsIn = proxiedComptroller.getAssetsIn(address(user1));
+    require(address(assetsIn[0]) == address(cTokenB), "assetsIn is not correct");
+
+    // get account liquidity for user1
+    (,uint256 initialLiquidity,) = proxiedComptroller.getAccountLiquidity(address(user1));
+
+    // borrow tokenA
+    uint256 borrowAmount = 50 * 10**tokenA.decimals();
+    uint256 borrowResult = cTokenA.borrow(borrowAmount);
+    require(borrowResult == 0, "Borrow failed");
+
+    // get account liquidity for user1 after borrow
+    (,uint256 liquidityAfterBorrow,) = proxiedComptroller.getAccountLiquidity(address(user1));
+    require(tokenA.balanceOf(address(user1)) == initialBalanceA + borrowAmount, "borrowAmount is not correct");
+    require(liquidityAfterBorrow == 0, "liquidityAfterBorrow is not correct after borrow");
+
+    vm.stopPrank();
+    // Finish preparation
+
+    // decrease collateral factor
+    proxiedComptroller._setCollateralFactor(CToken(address(cTokenB)), 0.3e18);
+
+    // get shortfall for user1 after collateral factor decrease
+    // user1 borrows $50 tokenA, and close factor is 0.3, so user1's shortfall is $50 - ($100 * 0.3) = $20
+    (,, uint256 shortfall) = proxiedComptroller.getAccountLiquidity(address(user1));
+    assertEq(shortfall, 20);
+
+    // user2 will liquidate user1
+    vm.startPrank(user2);
+
+    // user1 borrows 50 tokenA, and close factor is 0.5, so user2 can liquidate $50 * 0.5 = $25 tokenA
+    uint256 liquidateAmount = 25 * 10**tokenA.decimals();
+    tokenA.approve(address(cTokenA), liquidateAmount);
+    uint256 liquidateResult = cTokenA.liquidateBorrow(address(user1), liquidateAmount, CToken(address(cTokenB)));
+    require(liquidateResult == 0, "Liquidate failed");
+
+    // get shortfall for user1 after user2 liquidates
+    // after liquidate user1's debt becomes $25 tokenA, and the liquidation incentive for user2 is $25 * 1.08 = $27
+    // user1's tokenB value will be $100 - $27 = $73, and since collateral factor is 0.3 now
+    // user1 can only borrow $73 * 0.3 = $22 (it rounds) tokenA, so user1 still has shortfall: $25 - $22 = $3
+    (,, uint256 shortfallAfterLiquidate) = proxiedComptroller.getAccountLiquidity(address(user1));
+    assertEq(shortfallAfterLiquidate, 3);
+
+    vm.stopPrank();
+  }
 }
