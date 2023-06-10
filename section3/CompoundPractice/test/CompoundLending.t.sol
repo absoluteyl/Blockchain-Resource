@@ -79,4 +79,42 @@ contract CompoundLendingTest is CompoundLendingSetUp {
 
     vm.stopPrank();
   }
+
+  function testBorrowAByB() public {
+    // let cTokenA has tokenA to borrow
+    deal(address(tokenA), address(cTokenA), 10000 * 10**tokenA.decimals());
+
+    vm.startPrank(user1);
+
+    // mint cTokenB
+    uint256 mintAmount = 1 * 10**tokenB.decimals();
+    tokenB.approve(address(cTokenB), mintAmount);
+    uint256 mintResult = cTokenB.mint(mintAmount);
+    require(mintResult == 0, "Mint failed");
+    require(cTokenB.balanceOf(address(user1)) == mintAmount, "Mint amount is not correct");
+
+    // collateralize cTokenB
+    address[] memory cTokens = new address[](1);
+    cTokens[0] = address(cTokenB);
+    proxiedComptroller.enterMarkets(cTokens);
+
+    // make sure cTokenB is been collateral
+    CToken[] memory assetsIn = proxiedComptroller.getAssetsIn(address(user1));
+    require(address(assetsIn[0]) == address(cTokenB), "assetsIn is not correct");
+
+    // // check account liquidity for user1
+    // (uint err, uint liquidity, uint shortfall) = proxiedComptroller.getAccountLiquidity(address(user1));
+    // console.log("err: ", err);
+    // console.log("liquidity: ", liquidity);
+    // console.log("shortfall: ", shortfall);
+
+    // borrow tokenA
+    uint256 borrowAmount = 50 * 10**tokenA.decimals();
+    uint256 borrowResult = cTokenA.borrow(borrowAmount);
+    require(borrowResult == 0, "Borrow failed");
+
+    vm.stopPrank();
+
+    assertEq(tokenA.balanceOf(address(user1)), initialBalanceA + borrowAmount);
+  }
 }
