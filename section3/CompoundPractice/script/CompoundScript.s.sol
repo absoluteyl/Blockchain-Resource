@@ -122,7 +122,7 @@ contract CompoundScript is Script {
         cTokenName,                   // cToken name
         cTokenSymbol,                 // cToken symbol
         cTokenDecimals,               // cToken decimals
-        payable(address(msg.sender)), // admin
+        payable(msg.sender),          // admin
         address(cErc20Delegate),      // CERC20 Delegate implementation,
         new bytes(0)                  // becomeImplementationData
     );
