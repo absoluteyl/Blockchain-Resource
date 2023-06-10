@@ -6,6 +6,7 @@ import "test/helper/CompoundLendingSetUp.sol";
 contract CompoundLendingTest is CompoundLendingSetUp {
 
   address public user1;
+  address public user2;
 
   uint256 public initialBalanceA;
   uint256 public initialBalanceB;
@@ -14,11 +15,16 @@ contract CompoundLendingTest is CompoundLendingSetUp {
     super.setUp();
 
     user1 = makeAddr("user1");
+    user2 = makeAddr("user2");
+
     initialBalanceA = 100 * 10 ** tokenA.decimals();
     initialBalanceB = 100 * 10 ** tokenB.decimals();
 
     deal(address(tokenA), user1, initialBalanceA);
     deal(address(tokenB), user1, initialBalanceB);
+
+    deal(address(tokenA), user2, initialBalanceA);
+    deal(address(tokenB), user2, initialBalanceB);
   }
 
   function testDeploy() public {
