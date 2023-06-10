@@ -38,30 +38,20 @@ contract CompoundLendingTest is CompoundLendingSetUp {
     console.log("cTokenA: ", address(cTokenA));
   }
 
-  function testMintA() public {
+  function testMintRedeemA() public {
     vm.startPrank(user1);
 
     tokenA.approve(address(cTokenA), initialBalanceA);
     uint256 mintResult = cTokenA.mint(initialBalanceA);
     require(mintResult == 0, "Mint failed");
-
-    vm.stopPrank();
 
     assertEq(cTokenA.balanceOf(address(user1)), initialBalanceA);
-  }
-
-  function testRedeemA() public {
-    vm.startPrank(user1);
-
-    tokenA.approve(address(cTokenA), initialBalanceA);
-    uint256 mintResult = cTokenA.mint(initialBalanceA);
-    require(mintResult == 0, "Mint failed");
 
     uint256 redeemResult = cTokenA.redeem(cTokenA.balanceOf(address(user1)));
     require(redeemResult == 0, "Redeem failed");
 
-    vm.stopPrank();
-
     assertEq(tokenA.balanceOf(address(user1)), initialBalanceA);
+
+    vm.stopPrank();
   }
 }
