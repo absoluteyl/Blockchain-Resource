@@ -80,7 +80,7 @@ contract CompoundLendingTest is CompoundLendingSetUp {
     vm.stopPrank();
   }
 
-  function testBorrowAByB() public {
+  function testBorrowRepay() public {
     // let cTokenA has tokenA to borrow
     deal(address(tokenA), address(cTokenA), 10000 * 10**tokenA.decimals());
 
@@ -115,6 +115,16 @@ contract CompoundLendingTest is CompoundLendingSetUp {
 
     assertEq(tokenA.balanceOf(address(user1)), initialBalanceA + borrowAmount);
     assertEq(liquidityAfterBorrow, 0);
+
+    // repay tokenA
+    tokenA.approve(address(cTokenA), borrowAmount);
+    cTokenA.repayBorrow(borrowAmount);
+
+    // get account liquidity for user1 after repay
+    (,uint256 liquidityAfterRepay,) = proxiedComptroller.getAccountLiquidity(address(user1));
+
+    assertEq(tokenA.balanceOf(address(user1)), initialBalanceA);
+    assertEq(liquidityAfterRepay, initialLiquidity); // liquidity should be the same as before
 
     vm.stopPrank();
   }
