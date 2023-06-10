@@ -42,6 +42,10 @@ contract CompoundLendingSetUp is Test {
   string public tokenAName = "TokenA";
   string public tokenASymbol = "TA";
 
+  ERC20 public tokenB;
+  string public tokenBName = "TokenB";
+  string public tokenBSymbol = "TB";
+
   // cTokens
   CErc20Delegate public cErc20Delegate;
 
@@ -50,6 +54,11 @@ contract CompoundLendingSetUp is Test {
   string public cTokenAName = "Compound TokenA";
   string public cTokenASymbol = "cTA";
   uint8 public cTokenADecimals = 18;
+
+  CErc20Delegator public cTokenB;
+  string public cTokenBName = "Compound TokenB";
+  string public cTokenBSymbol = "cTB";
+  uint8 public cTokenBDecimals = 18;
 
   address public admin;
 
@@ -84,6 +93,7 @@ contract CompoundLendingSetUp is Test {
 
     // deploy underlying tokens
     tokenA = new ERC20(tokenAName, tokenASymbol);
+    tokenB = new ERC20(tokenBName, tokenBSymbol);
 
     // deploy cErc20Delegate
     cErc20Delegate = new CErc20Delegate();
@@ -102,9 +112,25 @@ contract CompoundLendingSetUp is Test {
       new bytes(0)
     );
 
+    cTokenB = new CErc20Delegator(
+      address(tokenB),
+      proxiedComptroller,
+      interestRateModel,
+      initialExchangeRateMantissa,
+      cTokenBName,
+      cTokenBSymbol,
+      cTokenBDecimals,
+      payable(admin),
+      address(cErc20Delegate),
+      new bytes(0)
+    );
+
     // support cTokens to market
     _result = proxiedComptroller._supportMarket(CToken(address(cTokenA)));
     require(_result == 0, "Error setting support market for cTokenA");
+
+    _result = proxiedComptroller._supportMarket(CToken(address(cTokenB)));
+    require(_result == 0, "Error setting support market for cTokenB");
 
     vm.label(address(comptroller), "comptroller");
     vm.label(address(unitroller), "unitroller");
@@ -112,6 +138,8 @@ contract CompoundLendingSetUp is Test {
     vm.label(address(cErc20Delegate), "cErc20Delegate");
     vm.label(address(priceOracle), "priceOracle");
     vm.label(address(tokenA), "tokenA");
+    vm.label(address(tokenB), "tokenB");
     vm.label(address(cTokenA), "cTokenA");
+    vm.label(address(cTokenB), "cTokenB");
   }
 }
