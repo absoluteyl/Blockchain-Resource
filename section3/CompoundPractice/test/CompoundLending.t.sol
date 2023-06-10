@@ -102,19 +102,20 @@ contract CompoundLendingTest is CompoundLendingSetUp {
     CToken[] memory assetsIn = proxiedComptroller.getAssetsIn(address(user1));
     require(address(assetsIn[0]) == address(cTokenB), "assetsIn is not correct");
 
-    // // check account liquidity for user1
-    // (uint err, uint liquidity, uint shortfall) = proxiedComptroller.getAccountLiquidity(address(user1));
-    // console.log("err: ", err);
-    // console.log("liquidity: ", liquidity);
-    // console.log("shortfall: ", shortfall);
+    // get account liquidity for user1
+    (,uint256 initialLiquidity,) = proxiedComptroller.getAccountLiquidity(address(user1));
 
     // borrow tokenA
     uint256 borrowAmount = 50 * 10**tokenA.decimals();
     uint256 borrowResult = cTokenA.borrow(borrowAmount);
     require(borrowResult == 0, "Borrow failed");
 
-    vm.stopPrank();
+    // get account liquidity for user1 after borrow
+    (,uint256 liquidityAfterBorrow,) = proxiedComptroller.getAccountLiquidity(address(user1));
 
     assertEq(tokenA.balanceOf(address(user1)), initialBalanceA + borrowAmount);
+    assertEq(liquidityAfterBorrow, 0);
+
+    vm.stopPrank();
   }
 }
