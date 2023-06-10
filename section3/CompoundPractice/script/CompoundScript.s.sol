@@ -15,7 +15,7 @@ import { CErc20Delegator } from "compound-protocol/contracts/CErc20Delegator.sol
 
 contract CompoundScript is Script {
   // Underlaying Token
-  ERC20 public USDC;
+  ERC20 public uToken;
   string public uTokenName = "USD Coin";
   string public uTokenSymbol = "USDC";
 
@@ -47,7 +47,7 @@ contract CompoundScript is Script {
   uint256 public initialExchangeRateMantissa = 1e18;
 
   // cToken Delegator
-  CErc20Delegator public cUSDC;
+  CErc20Delegator public cToken;
 
   // result to be reused for status check
   uint256 private _result;
@@ -74,7 +74,7 @@ contract CompoundScript is Script {
   =====================
   */
   function _deployUnderlyingToken() private {
-    USDC = new ERC20(uTokenName, uTokenSymbol);
+    uToken = new ERC20(uTokenName, uTokenSymbol);
   }
 
   function _deployPriceOracle() private {
@@ -120,8 +120,8 @@ contract CompoundScript is Script {
   }
 
   function _deployCTokenDelegator() private {
-    cUSDC = new CErc20Delegator(
-        address(USDC),                // underlying token
+    cToken = new CErc20Delegator(
+        address(uToken),              // underlying token
         proxiedComptroller,           // comptroller
         interestRateModel,            // interestRateModel
         initialExchangeRateMantissa,  // initialExchangeRateMantissa
