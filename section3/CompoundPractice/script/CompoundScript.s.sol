@@ -74,43 +74,22 @@ contract CompoundScript is Script {
   =====================
   */
   function _deployUnderlyingToken() private {
-    console.log("\n=== Deploying Underlaying Token ===");
-
     USDC = new ERC20(uTokenName, uTokenSymbol);
-
-    console.log("Name: %s,", USDC.name());
-    console.log("Symbol: %s,", USDC.symbol());
-    console.log("Decimals: %d,", USDC.decimals());
-    console.log("Address: %s", address(USDC));
   }
 
   function _deployPriceOracle() private {
-    console.log("\n=== Deploying Price Oracle ===");
-
     priceOracle = new SimplePriceOracle();
-
-    console.log("Address: %s", address(priceOracle));
   }
 
   function _deployComptroller() private {
-    console.log("\n=== Deploying Comptroller ===");
-
     comptroller = new Comptroller();
-
-    console.log("Address: %s", address(comptroller));
   }
 
   function _deployUnitroller() private {
-    console.log("\n=== Deploying Unitroller ===");
-
     unitroller = new Unitroller();
-
-    console.log("Address: %s", address(unitroller));
   }
 
   function _dealUnitrollerImplementation() private {
-    console.log("\n=== Dealing with Unitroller implementation ===");
-
     // set implementation
     _result = unitroller._setPendingImplementation(address(comptroller));
     require(_result == 0, "Error setting unitroller pending implementation");
@@ -131,25 +110,16 @@ contract CompoundScript is Script {
   }
 
   function _deployInterestRateModel() private {
-    console.log("\n=== Deploying Interest Rate Model ===");
-
     interestRateModel = new WhitePaperInterestRateModel(
       baseRatePerYear, multiplierPerYear
     );
-
-    console.log("Address: %s", address(interestRateModel));
   }
 
   function _deployCTokenDelegate() private {
-    console.log("\n=== Deploying CERC20 Delegate ===");
-
     CErc20Delegate cErc20Delegate = new CErc20Delegate();
-
-    console.log("Address: %s", address(cErc20Delegate));
   }
 
   function _deployCTokenDelegator() private {
-    console.log("\n=== Deploying CERC20 Delegator ===");
     cUSDC = new CErc20Delegator(
         address(USDC),                // underlying token
         proxiedComptroller,           // comptroller
@@ -162,6 +132,5 @@ contract CompoundScript is Script {
         address(cErc20Delegate),      // CERC20 Delegate implementation,
         new bytes(0)                  // becomeImplementationData
     );
-    console.log("Address: %s", address(cUSDC));
   }
 }
