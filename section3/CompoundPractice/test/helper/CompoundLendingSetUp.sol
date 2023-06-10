@@ -136,6 +136,10 @@ contract CompoundLendingSetUp is Test {
     priceOracle.setUnderlyingPrice(CToken(address(cTokenA)), 1);
     priceOracle.setUnderlyingPrice(CToken(address(cTokenB)), 100);
 
+    // set cTokenB collateral factor
+    _result = proxiedComptroller._setCollateralFactor(CToken(address(cTokenB)), 0.5e18);
+    require(_result == 0, "Error setting collateral factor for cTokenB");
+
     vm.label(address(comptroller), "comptroller");
     vm.label(address(unitroller), "unitroller");
     vm.label(address(interestRateModel), "interestRateModel");
