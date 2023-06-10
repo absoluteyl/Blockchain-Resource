@@ -39,17 +39,6 @@ contract CompoundLendingTest is CompoundLendingSetUp {
 
     require(address(cTokenA) != address(0), "cTokenA is not deployed");
     require(address(cTokenB) != address(0), "cTokenB is not deployed");
-
-    console.log("=== Deploy Result ===");
-    console.log("comptroller: ", address(comptroller));
-    console.log("unitroller: ", address(unitroller));
-    console.log("interestRateModel: ", address(interestRateModel));
-    console.log("cErc20Delegate: ", address(cErc20Delegate));
-    console.log("priceOracle: ", address(priceOracle));
-    console.log("tokenA: ", address(tokenA));
-    console.log("tokenB: ", address(tokenB));
-    console.log("cTokenA: ", address(cTokenA));
-    console.log("cTokenB: ", address(cTokenB));
   }
 
   function testMintRedeemA() public {
