@@ -68,6 +68,7 @@ contract CompoundScript is Script {
     _deployCTokenDelegator();
 
     _deployPriceOracle();
+    _configureComptroller();
 
     vm.stopBroadcast();
   }
@@ -96,18 +97,6 @@ contract CompoundScript is Script {
     require(_result == 0, "Error setting unitroller pending implementation");
     comptroller._become(unitroller);
     proxiedComptroller = Comptroller(address(unitroller));
-
-    // set liquidation incentive
-    _result = proxiedComptroller._setLiquidationIncentive(liquidationIncentive);
-    require(_result == 0, "Error setting liquidation incentive");
-
-    // set close factor
-    _result = proxiedComptroller._setCloseFactor(closeFactorMantissa);
-    require(_result == 0, "Error setting close factor");
-
-    // set price oracle
-    _result = proxiedComptroller._setPriceOracle(priceOracle);
-    require(_result == 0, "Error setting price oracle");
   }
 
   function _deployInterestRateModel() private {
@@ -137,5 +126,19 @@ contract CompoundScript is Script {
         address(cErc20Delegate),      // CERC20 Delegate implementation,
         new bytes(0)                  // becomeImplementationData
     );
+  }
+
+  function _configureComptroller() private {
+    // set liquidation incentive（清算獎勵）
+    _result = proxiedComptroller._setLiquidationIncentive(liquidationIncentive);
+    require(_result == 0, "Error setting liquidation incentive");
+
+    // set close factor（清算係數）
+    _result = proxiedComptroller._setCloseFactor(closeFactorMantissa);
+    require(_result == 0, "Error setting close factor");
+
+    // set price oracle
+    _result = proxiedComptroller._setPriceOracle(priceOracle);
+    require(_result == 0, "Error setting price oracle");
   }
 }
