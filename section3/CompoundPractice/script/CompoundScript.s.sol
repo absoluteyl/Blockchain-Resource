@@ -56,15 +56,18 @@ contract CompoundScript is Script {
 
   function run() external {
     vm.startBroadcast(vm.envUint("WALLET_PRIVATE_KEY"));
-
     _deployUnderlyingToken();
-    _deployPriceOracle();
+
     _deployComptroller();
     _deployUnitroller();
     _dealUnitrollerImplementation();
+
     _deployInterestRateModel();
+
     _deployCTokenDelegate();
     _deployCTokenDelegator();
+
+    _deployPriceOracle();
 
     vm.stopBroadcast();
   }
