@@ -140,5 +140,9 @@ contract CompoundScript is Script {
     // set price oracle
     _result = proxiedComptroller._setPriceOracle(priceOracle);
     require(_result == 0, "Error setting price oracle");
+
+    // support cToken to market
+    _result = proxiedComptroller._supportMarket(CToken(address(cToken)));
+    require(_result == 0, "Error setting support market");
   }
 }
