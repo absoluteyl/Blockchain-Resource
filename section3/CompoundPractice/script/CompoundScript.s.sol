@@ -116,7 +116,7 @@ contract CompoundScript is Script {
   }
 
   function _deployCTokenDelegate() private {
-    CErc20Delegate cErc20Delegate = new CErc20Delegate();
+    cErc20Delegate = new CErc20Delegate();
   }
 
   function _deployCTokenDelegator() private {
