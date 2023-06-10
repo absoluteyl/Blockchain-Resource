@@ -82,10 +82,6 @@ contract CompoundScript is Script {
     uToken = new ERC20(uTokenName, uTokenSymbol);
   }
 
-  function _deployPriceOracle() private {
-    priceOracle = new SimplePriceOracle();
-  }
-
   function _deployComptroller() private {
     comptroller = new Comptroller();
   }
@@ -118,6 +114,10 @@ contract CompoundScript is Script {
     interestRateModel = new WhitePaperInterestRateModel(
       baseRatePerYear, multiplierPerYear
     );
+  }
+
+  function _deployPriceOracle() private {
+    priceOracle = new SimplePriceOracle();
   }
 
   function _deployCTokenDelegate() private {
