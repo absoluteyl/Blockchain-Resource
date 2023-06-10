@@ -132,6 +132,10 @@ contract CompoundLendingSetUp is Test {
     _result = proxiedComptroller._supportMarket(CToken(address(cTokenB)));
     require(_result == 0, "Error setting support market for cTokenB");
 
+    // set Price for underlying tokens
+    priceOracle.setUnderlyingPrice(CToken(address(cTokenA)), 1);
+    priceOracle.setUnderlyingPrice(CToken(address(cTokenB)), 100);
+
     vm.label(address(comptroller), "comptroller");
     vm.label(address(unitroller), "unitroller");
     vm.label(address(interestRateModel), "interestRateModel");
