@@ -10,10 +10,13 @@ slither
 .idea
 contracts/hardhat-dependency-compiler/*
 .openzeppelin/unknown-31337.json
-.env*
+.env
 forge-cache/
 cache_forge/
 out/
 typechain-types
+
+# Ignores development broadcast logs
+broadcast/
 
 *.ans.*
