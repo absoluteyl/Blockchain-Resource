@@ -169,7 +169,7 @@ contract CompoundLendingTest is CompoundLendingSetUp {
     // get shortfall for user1 after collateral factor decrease
     // user1 borrows $50 tokenA, and close factor is 0.3, so user1's shortfall is $50 - ($100 * 0.3) = $20
     (,, uint256 shortfall) = proxiedComptroller.getAccountLiquidity(address(user1));
-    assertEq(shortfall, 20);
+    assertEq(shortfall, 20e18);
 
     // user2 will liquidate user1
     vm.startPrank(user2);
@@ -183,9 +183,9 @@ contract CompoundLendingTest is CompoundLendingSetUp {
     // get shortfall for user1 after user2 liquidates
     // after liquidate user1's debt becomes $25 tokenA, and the liquidation incentive for user2 is $25 * 1.08 = $27
     // user1's tokenB value will be $100 - $27 = $73, and since collateral factor is 0.3 now
-    // user1 can only borrow $73 * 0.3 = $22 (it rounds) tokenA, so user1 still has shortfall: $25 - $22 = $3
+    // user1 can only borrow $73 * 0.3 = $21.9 tokenA, so user1 still has shortfall: $25 - $22 = $3.1
     (,, uint256 shortfallAfterLiquidate) = proxiedComptroller.getAccountLiquidity(address(user1));
-    assertEq(shortfallAfterLiquidate, 3);
+    assertEq(shortfallAfterLiquidate, 3.1e18);
 
     vm.stopPrank();
   }
@@ -230,12 +230,12 @@ contract CompoundLendingTest is CompoundLendingSetUp {
     // Finish preparation
 
     // decrease price
-    priceOracle.setUnderlyingPrice(CToken(address(cTokenB)), 70);
+    priceOracle.setUnderlyingPrice(CToken(address(cTokenB)), 70e18);
 
     // get shortfall for user1 after collateral factor decrease
     // user1 borrows $50 tokenA, and price is now $70, so user1's shortfall is $50 - ($70 * 0.3) = $15
     (,, uint256 shortfall) = proxiedComptroller.getAccountLiquidity(address(user1));
-    assertEq(shortfall, 15);
+    assertEq(shortfall, 15e18);
 
     // user2 will liquidate user1
     vm.startPrank(user2);
@@ -248,11 +248,11 @@ contract CompoundLendingTest is CompoundLendingSetUp {
 
     // get shortfall for user1 after user2 liquidates
     // after liquidate user1's debt becomes $25 tokenA, and the liquidation incentive for user2 is $25*1.08 = $27
-    // user1's tokenB value will be $70 - $27 = $43, the allowed borrow amount becomes $43 * 0.5 = $22 (it rounds)
-    // so user1 still has shortfall $25 - $22 = $3
+    // user1's tokenB value will be $70 - $27 = $43, the allowed borrow amount becomes $43 * 0.5 = $21.5
+    // so user1 still has shortfall $25 - $21.5 = $3.5
     (,, uint256 shortfallAfterLiquidate) = proxiedComptroller.getAccountLiquidity(address(user1));
     console.log("shortfallAfterLiquidate: ", shortfallAfterLiquidate);
-    assertEq(shortfallAfterLiquidate, 3);
+    assertEq(shortfallAfterLiquidate, 3.5e18);
 
     vm.stopPrank();
   }

@@ -133,8 +133,8 @@ contract CompoundLendingSetUp is Test {
     require(_result == 0, "Error setting support market for cTokenB");
 
     // set Price for underlying tokens
-    priceOracle.setUnderlyingPrice(CToken(address(cTokenA)), 1);
-    priceOracle.setUnderlyingPrice(CToken(address(cTokenB)), 100);
+    priceOracle.setUnderlyingPrice(CToken(address(cTokenA)), 1e18);
+    priceOracle.setUnderlyingPrice(CToken(address(cTokenB)), 100e18);
 
     // set cTokenB collateral factor
     _result = proxiedComptroller._setCollateralFactor(CToken(address(cTokenB)), 0.5e18);
