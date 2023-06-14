@@ -28,8 +28,6 @@ contract AaveFlashLoan is IFlashLoanSimpleReceiver {
   }
 
   function execute(BalanceChecker checker) external {
-    // TODO
-    console.log("execute");
     POOL().flashLoanSimple(address(this), USDC, 10_000_000 * 10 ** 6, abi.encode(checker), 0);
   }
 
