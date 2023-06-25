@@ -16,15 +16,45 @@ contract FlashSwapLiquidate is IUniswapV2Callee {
   IUniswapV2Router02 public router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);
   IUniswapV2Factory public factory = IUniswapV2Factory(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f);
 
-  
+
   function uniswapV2Call(address sender, uint256 amount0, uint256 amount1, bytes calldata data) external override {
     require(sender == address(this), "Sender must be this contract");
     require(amount0 > 0 || amount1 > 0, "amount0 or amount1 must be greater than 0");
+    // 0. Decode callback data
+    (
+      address borrower,
+      uint256 repayAmount // the DAI amount we need to repay to Uniswap
+    ) = abi.decode(data, (address, uint256));
 
-    // TODO
+    // 1. liquidate borrower's cUSDC debt and get cDAI
+    USDC.approve(address(cUSDC), amount1); // amount1 is USDC amount
+    uint256 liquidateResult = cUSDC.liquidateBorrow(borrower, amount1, CErc20(cDAI));
+    require(liquidateResult == 0, "liquidate failed");
+
+    // 2. redeem cDAI to DAI
+    uint256 redeemResult = cDAI.redeem(cDAI.balanceOf(address(this)));
+    require(redeemResult == 0, "redeem failed");
+
+    // 3. transfer DAI back to Uniswap
+    DAI.transfer(msg.sender, repayAmount);
   }
 
   function liquidate(address borrower, uint256 amountOut) external {
-    // TODO
+    // Get pair address
+    address[] memory path = new address[](2);
+    path[0] = address(DAI);
+    path[1] = address(USDC);
+    address pair = factory.getPair(path[0], path[1]);
+
+    // Calculate amountIn
+    uint256 amountIn = router.getAmountsIn(amountOut, path)[0];
+
+    // Swap by amountOut
+    IUniswapV2Pair(pair).swap(
+      0,
+      amountOut,
+      address(this),
+      abi.encode(borrower, amountIn)
+    );
   }
 }
